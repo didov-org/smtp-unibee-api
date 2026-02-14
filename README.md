@@ -1,151 +1,108 @@
-# UniBee Recurring Billing Project Based On GoFrame Template
+# SMTP UniBee API
 
-<div align=center>
-<img src="http://unibee.top/files/invoice/SubStatusAndTimeline.png" width="300"/>
-</div>
+This is a modified fork of [UniBee API](https://github.com/UniBee-Billing/unibee-api), a recurring billing system backend built on the [GoFrame](https://github.com/gogf/gf) framework.
 
-### Gateway
+**Original project:** [UniBee-Billing/unibee-api](https://github.com/UniBee-Billing/unibee-api)
+**Original authors:** [UniBee-Billing](https://github.com/UniBee-Billing)
+
+## License
+
+This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**, the same license as the original UniBee API. See the [LICENSE](LICENSE) file for the full text.
+
+As required by AGPL-3.0 Section 13: if you deploy a modified version of this software as a network service, you must make the complete corresponding source code available to all users interacting with it over the network.
+
+## Changes from Upstream
+
+This fork adds SMTP-based email delivery support and other modifications. See the [commit history](../../commits/main) for a detailed record of all changes made from the upstream project.
+
+## Supported Integrations
+
+### Payment Gateways
 - Stripe
-- Paypal
+- PayPal
 - Changelly
 - Payssion
 
-### VatGateway
+### VAT
 - VatSense
 
 ### Email
 - SendGrid
+- SMTP (added in this fork)
 
+## Requirements
 
-#### Mysql Integration(Needed)
+- **MySQL** — `github.com/gogf/gf/contrib/drivers/mysql/v2`
+- **Redis** — `github.com/gogf/gf/contrib/nosql/redis/v2`
+- **Nacos** (optional) — for configuration management
 
-- \_ "github.com/gogf/gf/contrib/drivers/mysql/v2"
+## Getting Started
 
-#### Redis Integration(Needed)
+### Using Nacos (optional)
 
-- \_ "github.com/gogf/gf/contrib/nosql/redis/v2"
-
-#### Nacos Integration(Optional)
-###### Program Params
---nacos-ip={your_nacos_ip}\
---nacos-port={your_nacos_port}\
---nacos-namespace={your_nacos_namespace}\
---nacos-group={your_nacos_group}\
---nacos-data-id={your_nacos_data_id}\
-###### If Add To Env (K8S)
-nacos.ip={your_nacos_ip}\
-nacos.port={your_nacos_port}\
-nacos.namespace={your_nacos_namespace}\
-nacos.group={your_nacos_group}\
-nacos.data.id={your_nacos_data_id}\
-
-#### TimeZone-UTC
-
-### Env `Stage`
-
-#### OpenAPI V3 Doc：http://unibee.top/unib/swagger
-
-#### OpenAPI V3 Json：http://unibee.top/unib/swagger
-
-#### Stage Information Doc https://unibee.atlassian.net/wiki/spaces/SD/pages/4292713/AWS+Develop+Environment
-
-### Env `Local`
-
-#### Local Run Add Program Arguments Below: 
+Program arguments:
 ```bash
---nacos-port=30099 --nacos-namespace=local --nacos-group=config --nacos-data-id=unib-settings.yaml --nacos-ip=api.unibee.top
-```
-##### ex: 
-```bash
-go run main.go --nacos-port=30099 --nacos-namespace=local --nacos-group=config --nacos-data-id=unib-settings.yaml --nacos-ip=api.unibee.top
+go run main.go \
+  --nacos-ip={your_nacos_ip} \
+  --nacos-port={your_nacos_port} \
+  --nacos-namespace={your_nacos_namespace} \
+  --nacos-group={your_nacos_group} \
+  --nacos-data-id={your_nacos_data_id}
 ```
 
-If do not use nacos, should manual setting `config.yaml` in project dir, the template `config.yaml` is `manifest/config/config.yaml.template`
+K8S environment variables:
+```
+nacos.ip={your_nacos_ip}
+nacos.port={your_nacos_port}
+nacos.namespace={your_nacos_namespace}
+nacos.group={your_nacos_group}
+nacos.data.id={your_nacos_data_id}
+```
+
+### Without Nacos
+
+Copy `manifest/config/config.yaml.template` to `config.yaml` in the project root, then:
 ```bash
 go run main.go --nacos-enable=false
 ```
 
-#### OpenAPI V3 Doc：http://127.0.0.1:8088/swagger
+### Local Development
 
-#### Swagger Try API：http://127.0.0.1:8088/swagger-ui.html
-
-#### OpenAPI V3 Json：http://127.0.0.1:8088/api.json
-
-### Develop Tools
-#### Generate API Controller Shell：
 ```bash
-gf gen ctrl
-```
-#### Generate Dao Code Shell：
-```bash
-gf gen dao
+go run main.go --nacos-port=30099 --nacos-namespace=local --nacos-group=config --nacos-data-id=unib-settings.yaml --nacos-ip=api.unibee.top
 ```
 
-### GoFrame Quick Start:
-- Github : https://github.com/gogf/gf
-- Doc : https://goframe.org/pages/viewpage.action?pageId=1114399
-- API Generate Shell: gf gen ctrl (should have gf install)
-  - Generate Controller After API Definition
-  - Doc https://goframe.org/pages/viewpage.action?pageId=93880327
-- Dao Generate Shell: gf gen dao (should have gf install)
-  - Generate Dao|Entity|DO After Database Table Change 
-  - Doc https://goframe.org/pages/viewpage.action?pageId=3673173 (need delete config.yaml under root dic)
+- OpenAPI V3 Doc: http://127.0.0.1:8088/swagger
+- Swagger UI: http://127.0.0.1:8088/swagger-ui.html
+- OpenAPI V3 JSON: http://127.0.0.1:8088/api.json
 
-Next Integration
-https://openapi-generator.tech/docs/generators/
+### Code Generation
 
-Basic Directory Structure
-The basic directory structure of the GoFrame business project is as follows (using the Single Repo as an example) :
+```bash
+gf gen ctrl  # Generate API controllers
+gf gen dao   # Generate DAO code after DB table changes
+```
 
+See the [GoFrame documentation](https://goframe.org) for more details.
 
-├── api\
-├── hack\
-├── internal\
-│   ├── cmd\
-│   ├── consts\
-│   ├── controller\
-│   ├── dao\
-│   ├── logic\
-│   ├── model\
-│   |   ├── do\
-│   │   └── entity\
-│   └── service\
-├── manifest\
-├── resource\
-├── utility\
-├── go.mod\
-└── main.go\
-🔥 Important note 🔥 : The engineering catalog of the framework adopts a universal design to meet the needs of different complex business projects, but the actual project can be appropriate to increase or decrease the default catalog according to the needs of the project. For example, if no i18n/template/protobuf requirement is required, delete the corresponding directory. For example, for very simple business projects (such as verification/demonstration projects), do not consider the use of rigorous dao/logic/model directory and features, then directly delete the corresponding directory, you can directly implement the business logic in the controller. Everything can be flexibly assembled by the developer!
+## Project Structure
 
-API External interface Defines the input/output data structure of the service provided externally. Considering the need for version management, api/xxx/v1... Exists.
-hack tool scripts Store project development tools and scripts. For example, the configuration of CLI tools, various shell/bat scripts and other files.
-internal Internal logic Directory for storing service logic. Hide visibility from the outside through the Golang internal feature.
-- cmd CLI manages the directory. Multiple command lines can be managed and maintained.
-- consts
-  Constant definition
-
-All constant definitions for the project.
-
-- controller Indicates the interface layer that receives and parses user input parameters.
-- dao
-
-Data Access Data access objects, a layer of abstract objects used to interact with the underlying database, contain only the most basic CURD methods
-- logic Service encapsulation Service logic encapsulation management, specific service logic implementation and encapsulation. Is often the most complex part of a project.
-- redismq Message System Core Implementation Base On Redis Stream
-- consumer Message Topic Consumer For Redis Stream 
-- cronjob CronJobs
-- model structure Model data structure management module, manage data entity objects, and input and output data structure definitions.
-  -do domain objects are used to transform the service model and instance model in dao data operations. They are maintained by the tool and cannot be modified by users.
-- entity Data model A data model is a one-to-one relationship between a model and a data set. It is maintained by the tool and cannot be modified by users.
-- [Deprecate]service Service interface Indicates the interface definition layer for decoupling service modules. The specific interface implementation is injected in logic.
-  The manifest delivery list contains the files that compile, deploy, run, and configure the program. Common contents are as follows:
-- config Indicates the directory for storing configuration files.
-- docker image file Docker image related dependency files, script files, and so on.
-- deploy deployment file Specifies the deployment file. Yaml templates for clustered deployment of Kubernetes are provided by default, managed through kustomize.
-- protobuf protocol file Specifies the protocol definition file for the GRPC protocol. After the protocol file is compiled, a go file is generated and stored in the api directory.
-  resource Static resource Static resource file. These files can often be injected into a release file in the form of resource packaging/image compilation.
-  Go.mod Dependency Management A dependency description file managed using the Go Module package.
-  main.go entry file Program entry file.
-
-
-TODO Mark https://github.com/golang-migrate/migrate
+```
+├── api/          # External API input/output definitions
+├── hack/         # Dev tools and scripts
+├── internal/
+│   ├── cmd/      # CLI entry points
+│   ├── consts/   # Constants
+│   ├── controller/ # Request handling layer
+│   ├── dao/      # Data access objects
+│   ├── logic/    # Business logic
+│   ├── model/
+│   │   ├── do/   # Domain objects (generated)
+│   │   └── entity/ # Data models (generated)
+│   └── service/  # Service interfaces
+├── manifest/     # Config, Docker, deploy files
+├── resource/     # Static resources
+├── utility/      # Utilities
+├── go.mod
+└── main.go
+```
