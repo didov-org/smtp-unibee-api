@@ -31,3 +31,5 @@ test/out/*.*
 embedded/node_modules
 embedded/build
 squash_opensource.sh
+CLAUDE.md
+tmp/
