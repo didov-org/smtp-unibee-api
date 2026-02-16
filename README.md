@@ -1,4 +1,4 @@
-# SMTP UniBee API
+# RTBilling API
 
 This is a modified fork of [UniBee API](https://github.com/UniBee-Billing/unibee-api), a recurring billing system backend built on the [GoFrame](https://github.com/gogf/gf) framework.
 
