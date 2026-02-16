@@ -134,7 +134,12 @@ func (c *ControllerProfile) Get(ctx context.Context, req *profile.GetReq) (res *
 		ExchangeRateApiKey:           utility.HideStar(exchangeApiKey),
 		OpenAPIHost:                  config.GetConfigInstance().Server.GetServerPath(),
 		OpenAPIKey:                   apikey,
-		SendGridKey:                  utility.HideStar(emailData),
+		SendGridKey: func() string {
+			if defaultEmailGateway == "sendgrid" {
+				return utility.HideStar(emailData)
+			}
+			return ""
+		}(),
 		EmailGateways:                emailGateways,
 		DefaultEmailGateway:          defaultEmailGateway,
 		EmailSender:                  emailSender,
