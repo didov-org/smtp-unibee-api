@@ -34,6 +34,25 @@ type GetReq struct {
 	g.Meta `path:"/get" tags:"Merchant" method:"get" summary:"Get Profile"`
 }
 
+type EmailGatewaySmtp struct {
+	SmtpHost      string `json:"smtpHost,omitempty"`
+	SmtpPort      int    `json:"smtpPort,omitempty"`
+	Username      string `json:"username,omitempty"`
+	HasPassword   bool   `json:"hasPassword,omitempty"`
+	UseTLS        bool   `json:"useTLS,omitempty"`
+	AuthType      string `json:"authType,omitempty"`
+	HasOAuthToken bool   `json:"hasOAuthToken,omitempty"`
+}
+
+type EmailGatewaySendgrid struct {
+	ApiKey string `json:"apiKey,omitempty"`
+}
+
+type EmailGateways struct {
+	Smtp     *EmailGatewaySmtp     `json:"smtp,omitempty"`
+	Sendgrid *EmailGatewaySendgrid `json:"sendgrid,omitempty"`
+}
+
 type GetRes struct {
 	Merchant                     *bean.Merchant                      `json:"merchant" dc:"Merchant"`
 	MerchantMember               *detail.MerchantMemberDetail        `json:"merchantMember" dc:"MerchantMember"`
@@ -47,6 +66,8 @@ type GetRes struct {
 	OpenAPIHost                  string                              `json:"openApiHost" description:"OpenApi Host"`
 	OpenAPIKey                   string                              `json:"openApiKey" description:"OpenAPIKey" `
 	SendGridKey                  string                              `json:"sendGridKey" description:"SendGridKey" `
+	EmailGateways                *EmailGateways                      `json:"emailGateways,omitempty" description:"Email gateway configs"`
+	DefaultEmailGateway          string                              `json:"defaultEmailGateway,omitempty" description:"Default email gateway name"`
 	VatSenseKey                  string                              `json:"vatSenseKey" description:"VatSenseKey" `
 	EmailSender                  *bean.Sender                        `json:"emailSender" description:"EmailSender" `
 	SegmentServerSideKey         string                              `json:"segmentServerSideKey" description:"SegmentServerSideKey" `

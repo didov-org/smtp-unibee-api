@@ -12,6 +12,7 @@ import (
 	"unibee/internal/logic/analysis/segment"
 	"unibee/internal/logic/currency"
 	"unibee/internal/logic/email"
+	"unibee/internal/logic/email/gateway"
 	member2 "unibee/internal/logic/member"
 	"unibee/internal/logic/merchant_config"
 	"unibee/internal/logic/multi_currencies"
@@ -43,6 +44,36 @@ func (c *ControllerProfile) Get(ctx context.Context, req *profile.GetReq) (res *
 		vatGatewayKey = ""
 	}
 	_, emailData := email.GetDefaultMerchantEmailConfig(ctx, merchant.Id)
+
+	// Build emailGateways and defaultEmailGateway for frontend
+	var defaultEmailGateway string
+	nameConfig := merchant_config.GetMerchantConfig(ctx, merchant.Id, email.KeyMerchantEmailName)
+	if nameConfig != nil {
+		defaultEmailGateway = nameConfig.ConfigValue
+	}
+	emailGateways := &profile.EmailGateways{}
+	sendgridConfig := merchant_config.GetMerchantConfig(ctx, merchant.Id, "sendgrid")
+	if sendgridConfig != nil && len(sendgridConfig.ConfigValue) > 0 {
+		emailGateways.Sendgrid = &profile.EmailGatewaySendgrid{
+			ApiKey: utility.HideStar(sendgridConfig.ConfigValue),
+		}
+	}
+	smtpConfig := merchant_config.GetMerchantConfig(ctx, merchant.Id, "smtp")
+	if smtpConfig != nil && len(smtpConfig.ConfigValue) > 0 {
+		var sc gateway.SmtpConfig
+		if err := utility.UnmarshalFromJsonString(smtpConfig.ConfigValue, &sc); err == nil {
+			emailGateways.Smtp = &profile.EmailGatewaySmtp{
+				SmtpHost:      sc.SmtpHost,
+				SmtpPort:      sc.SmtpPort,
+				Username:      sc.Username,
+				HasPassword:   len(sc.Password) > 0,
+				UseTLS:        sc.UseTLS,
+				AuthType:      sc.AuthType,
+				HasOAuthToken: len(sc.OAuthToken) > 0,
+			}
+		}
+	}
+
 	var emailSender *bean.Sender
 	one := email.GetMerchantEmailSender(ctx, _interface.GetMerchantId(ctx))
 	if one != nil {
@@ -103,7 +134,14 @@ func (c *ControllerProfile) Get(ctx context.Context, req *profile.GetReq) (res *
 		ExchangeRateApiKey:           utility.HideStar(exchangeApiKey),
 		OpenAPIHost:                  config.GetConfigInstance().Server.GetServerPath(),
 		OpenAPIKey:                   apikey,
-		SendGridKey:                  utility.HideStar(emailData),
+		SendGridKey: func() string {
+			if defaultEmailGateway == "sendgrid" {
+				return utility.HideStar(emailData)
+			}
+			return ""
+		}(),
+		EmailGateways:                emailGateways,
+		DefaultEmailGateway:          defaultEmailGateway,
 		EmailSender:                  emailSender,
 		VatSenseKey:                  utility.HideStar(vatGatewayKey),
 		SegmentServerSideKey:         segment.GetMerchantSegmentServerSideConfig(ctx, merchant.Id),

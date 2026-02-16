@@ -21,9 +21,13 @@ func SyncMerchantEmailTemplateToGateway(ctx context.Context, id int64, versionEn
 	if err != nil {
 		return err
 	}
-	_, emailGatewayKey := GetDefaultMerchantEmailConfig(ctx, one.MerchantId)
+	gatewayName, emailGatewayKey := GetDefaultMerchantEmailConfig(ctx, one.MerchantId)
 	if len(emailGatewayKey) == 0 {
 		return gerror.New("Default Email Gateway Need Setup")
+	}
+	if gatewayName == "smtp" {
+		g.Log().Debugf(ctx, "SyncMerchantEmailTemplateToGateway skipped: SMTP gateway does not use remote templates")
+		return nil
 	}
 	content := one.TemplateContent
 	if len(one.LanguageData) == 0 {

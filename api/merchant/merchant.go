@@ -106,6 +106,8 @@ type IMerchantEmail interface {
 	DeleteLocalizationVersion(ctx context.Context, req *email.DeleteLocalizationVersionReq) (res *email.DeleteLocalizationVersionRes, err error)
 	TestLocalizationVersion(ctx context.Context, req *email.TestLocalizationVersionReq) (res *email.TestLocalizationVersionRes, err error)
 	CustomizeLocalizationTemplateSync(ctx context.Context, req *email.CustomizeLocalizationTemplateSyncReq) (res *email.CustomizeLocalizationTemplateSyncRes, err error)
+	GatewaySetDefault(ctx context.Context, req *email.GatewaySetDefaultReq) (res *email.GatewaySetDefaultRes, err error)
+	GatewaySetupV2(ctx context.Context, req *email.GatewaySetupV2Req) (res *email.GatewaySetupV2Res, err error)
 }
 
 type IMerchantGateway interface {

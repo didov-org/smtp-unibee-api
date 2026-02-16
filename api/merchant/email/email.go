@@ -10,7 +10,7 @@ type GatewaySetupReq struct {
 	g.Meta      `path:"/gateway_setup" tags:"Email" method:"post" summary:"Email Gateway Setup"`
 	GatewayName string `json:"gatewayName"  dc:"The name of email gateway, 'sendgrid' or other for future updates" v:"required"`
 	Data        string `json:"data" dc:"The setup data of email gateway" v:"required"`
-	IsDefault   bool   `json:"IsDefault" d:"true" dc:"Whether setup the gateway as default or not, default is true" `
+	IsDefault   bool   `json:"isDefault" d:"true" dc:"Whether setup the gateway as default or not, default is true" `
 }
 
 type GatewaySetupRes struct {
@@ -36,6 +36,7 @@ type SendEmailToUserReq struct {
 	Subject           string                 `json:"subject"`
 	Content           string                 `json:"content"`
 	AttachInvoiceId   string                 `json:"attachInvoiceId" dc:"AttachInvoiceId"`
+	GatewayName       string                 `json:"gatewayName" dc:"Optional gateway override ('sendgrid' or 'smtp')"`
 }
 
 type SendEmailToUserRes struct {
@@ -67,4 +68,34 @@ type HistoryListRes struct {
 	EmailHistoryStatistics *detail.MerchantEmailHistoryStatistics `json:"emailHistoryStatistics"`
 	EmailHistories         []*detail.MerchantEmailHistoryDetail   `json:"emailHistories" dc:"Email History Object List"`
 	Total                  int                                    `json:"total" dc:"Total"`
+}
+
+type GatewaySetDefaultReq struct {
+	g.Meta      `path:"/gateway_set_default" tags:"Email" method:"post" summary:"Set Default Email Gateway"`
+	GatewayName string `json:"gatewayName" dc:"'sendgrid' or 'smtp'" v:"required"`
+}
+
+type GatewaySetDefaultRes struct {
+}
+
+type GatewaySetupV2Req struct {
+	g.Meta        `path:"/gateway_setup_v2" tags:"Email" method:"post" summary:"Email Gateway Setup V2 (sendgrid|smtp)"`
+	GatewayName   string         `json:"gatewayName" dc:"'sendgrid' or 'smtp'" v:"required"`
+	ApiCredential *ApiCredential `json:"apiCredential" dc:"Gateway credentials" v:"required"`
+	IsDefault     bool           `json:"isDefault" d:"true" dc:"Set as default gateway"`
+}
+
+type ApiCredential struct {
+	ApiKey   string `json:"apiKey,omitempty" dc:"SendGrid API key"`
+	SmtpHost string `json:"smtpHost,omitempty" dc:"SMTP server host"`
+	SmtpPort int    `json:"smtpPort,omitempty" dc:"SMTP server port (587 recommended)"`
+	Username string `json:"username,omitempty" dc:"SMTP username"`
+	Password string `json:"password,omitempty" dc:"SMTP password"`
+	UseTLS   bool   `json:"useTLS,omitempty" dc:"Enable STARTTLS"`
+	AuthType string `json:"authType,omitempty" dc:"Auth type: plain, cram-md5, xoauth2"`
+	OAuthToken string `json:"oauthToken,omitempty" dc:"OAuth2 token for xoauth2 auth"`
+}
+
+type GatewaySetupV2Res struct {
+	Data string `json:"data" dc:"The masked credential data"`
 }
