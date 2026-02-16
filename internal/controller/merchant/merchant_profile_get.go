@@ -66,11 +66,10 @@ func (c *ControllerProfile) Get(ctx context.Context, req *profile.GetReq) (res *
 				SmtpHost:      sc.SmtpHost,
 				SmtpPort:      sc.SmtpPort,
 				Username:      sc.Username,
-				Password:      utility.HideStar(sc.Password),
+				HasPassword:   len(sc.Password) > 0,
 				UseTLS:        sc.UseTLS,
-				SkipTLSVerify: sc.SkipTLSVerify,
 				AuthType:      sc.AuthType,
-				OAuthToken:    utility.HideStar(sc.OAuthToken),
+				HasOAuthToken: len(sc.OAuthToken) > 0,
 			}
 		}
 	}

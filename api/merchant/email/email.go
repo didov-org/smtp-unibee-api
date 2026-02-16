@@ -86,15 +86,14 @@ type GatewaySetupV2Req struct {
 }
 
 type ApiCredential struct {
-	ApiKey        string `json:"apiKey,omitempty" dc:"SendGrid API key"`
-	SmtpHost      string `json:"smtpHost,omitempty" dc:"SMTP server host"`
-	SmtpPort      int    `json:"smtpPort,omitempty" dc:"SMTP server port (587 recommended)"`
-	Username      string `json:"username,omitempty" dc:"SMTP username"`
-	Password      string `json:"password,omitempty" dc:"SMTP password"`
-	UseTLS        bool   `json:"useTLS,omitempty" dc:"Enable STARTTLS"`
-	SkipTLSVerify bool   `json:"skipTLSVerify,omitempty" dc:"Skip TLS certificate verification"`
-	AuthType      string `json:"authType,omitempty" dc:"Auth type: plain, cram-md5, xoauth2, none"`
-	OAuthToken    string `json:"oauthToken,omitempty" dc:"OAuth2 token for xoauth2 auth"`
+	ApiKey   string `json:"apiKey,omitempty" dc:"SendGrid API key"`
+	SmtpHost string `json:"smtpHost,omitempty" dc:"SMTP server host"`
+	SmtpPort int    `json:"smtpPort,omitempty" dc:"SMTP server port (587 recommended)"`
+	Username string `json:"username,omitempty" dc:"SMTP username"`
+	Password string `json:"password,omitempty" dc:"SMTP password"`
+	UseTLS   bool   `json:"useTLS,omitempty" dc:"Enable STARTTLS"`
+	AuthType string `json:"authType,omitempty" dc:"Auth type: plain, cram-md5, xoauth2"`
+	OAuthToken string `json:"oauthToken,omitempty" dc:"OAuth2 token for xoauth2 auth"`
 }
 
 type GatewaySetupV2Res struct {

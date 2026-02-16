@@ -91,11 +91,14 @@ func SendSmtpPdfAttachEmailToUser(ctx context.Context, f *sender.Sender, smtpCon
 
 func buildMimeMessage(f *sender.Sender, mailTo string, subject string, htmlContent string, attachData []byte, attachName string) []byte {
 	var buf bytes.Buffer
+	sanitizer := strings.NewReplacer("\r", "", "\n", "")
+	mailTo = sanitizer.Replace(mailTo)
+	fromAddr := sanitizer.Replace(f.Address)
 	encodedSubject := mime.QEncoding.Encode("utf-8", subject)
-	safeName := strings.NewReplacer("\r", "", "\n", "").Replace(f.Name)
+	safeName := sanitizer.Replace(f.Name)
 
 	if len(attachData) == 0 {
-		buf.WriteString(fmt.Sprintf("From: %s <%s>\r\n", safeName, f.Address))
+		buf.WriteString(fmt.Sprintf("From: %s <%s>\r\n", safeName, fromAddr))
 		buf.WriteString(fmt.Sprintf("To: %s\r\n", mailTo))
 		buf.WriteString(fmt.Sprintf("Subject: %s\r\n", encodedSubject))
 		buf.WriteString("MIME-Version: 1.0\r\n")
@@ -106,7 +109,7 @@ func buildMimeMessage(f *sender.Sender, mailTo string, subject string, htmlConte
 	}
 
 	boundary := fmt.Sprintf("===============%d==", time.Now().UnixNano())
-	buf.WriteString(fmt.Sprintf("From: %s <%s>\r\n", safeName, f.Address))
+	buf.WriteString(fmt.Sprintf("From: %s <%s>\r\n", safeName, fromAddr))
 	buf.WriteString(fmt.Sprintf("To: %s\r\n", mailTo))
 	buf.WriteString(fmt.Sprintf("Subject: %s\r\n", encodedSubject))
 	buf.WriteString("MIME-Version: 1.0\r\n")
@@ -123,7 +126,8 @@ func buildMimeMessage(f *sender.Sender, mailTo string, subject string, htmlConte
 	header := make(textproto.MIMEHeader)
 	header.Set("Content-Type", "application/pdf")
 	header.Set("Content-Transfer-Encoding", "base64")
-	header.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", attachName))
+	safeAttachName := strings.NewReplacer("\r", "", "\n", "", "\"", "").Replace(attachName)
+	header.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", safeAttachName))
 	for k, v := range header {
 		buf.WriteString(fmt.Sprintf("%s: %s\r\n", k, strings.Join(v, ", ")))
 	}

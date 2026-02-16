@@ -9,6 +9,7 @@ import (
 )
 
 func (c *ControllerEmail) GatewaySetup(ctx context.Context, req *email.GatewaySetupReq) (res *email.GatewaySetupRes, err error) {
+	utility.Assert(req.GatewayName != "smtp", "SMTP configuration requires the v2 endpoint")
 	err = email2.SetupMerchantEmailConfig(ctx, _interface.GetMerchantId(ctx), req.GatewayName, req.Data, req.IsDefault)
 	if err != nil {
 		return nil, err

@@ -20,6 +20,9 @@ func (c *ControllerEmail) GatewaySetDefault(ctx context.Context, req *email.Gate
 	utility.Assert(gwConfig != nil && len(gwConfig.ConfigValue) > 0,
 		fmt.Sprintf("email gateway '%s' has no saved configuration, set it up first", req.GatewayName))
 	err = update.SetMerchantConfig(ctx, merchantId, email2.KeyMerchantEmailName, req.GatewayName)
+	if err != nil {
+		return nil, err
+	}
 	operation_log.AppendOptLog(ctx, &operation_log.OptLogRequest{
 		MerchantId:     merchantId,
 		Target:         fmt.Sprintf("EmailGateway(%s)", req.GatewayName),
@@ -30,8 +33,5 @@ func (c *ControllerEmail) GatewaySetDefault(ctx context.Context, req *email.Gate
 		PlanId:         0,
 		DiscountCode:   "",
 	}, err)
-	if err != nil {
-		return nil, err
-	}
 	return &email.GatewaySetDefaultRes{}, nil
 }

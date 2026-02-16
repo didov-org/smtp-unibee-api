@@ -19,7 +19,9 @@ func (c *ControllerEmail) GatewaySetupV2(ctx context.Context, req *email.Gateway
 		utility.Assert(len(req.ApiCredential.ApiKey) > 0, "apiKey is required for sendgrid")
 		data = req.ApiCredential.ApiKey
 	} else {
-		utility.Assert(len(strings.TrimSpace(req.ApiCredential.SmtpHost)) > 0, "smtpHost is required for smtp")
+		smtpHost := strings.TrimSpace(req.ApiCredential.SmtpHost)
+		utility.Assert(len(smtpHost) > 0, "smtpHost is required for smtp")
+		utility.Assert(utility.ValidateExternalHost(smtpHost) == nil, "smtpHost must be a valid external SMTP server")
 		utility.Assert(req.ApiCredential.SmtpPort > 0 && req.ApiCredential.SmtpPort <= 65535, "smtpPort must be between 1 and 65535")
 		authType := req.ApiCredential.AuthType
 		if authType == "" {
@@ -33,17 +35,17 @@ func (c *ControllerEmail) GatewaySetupV2(ctx context.Context, req *email.Gateway
 			utility.Assert(len(req.ApiCredential.Username) > 0, "username is required for smtp with xoauth2 auth")
 			utility.Assert(len(req.ApiCredential.OAuthToken) > 0, "oauthToken is required for smtp with xoauth2 auth")
 		case "none":
-			// no credentials required
+			utility.Assert(false, "authType 'none' is not supported; SMTP requires authentication")
 		default:
 			utility.Assert(false, "unsupported authType: "+authType)
 		}
 		smtpCfg := gateway.SmtpConfig{
-			SmtpHost:      strings.TrimSpace(req.ApiCredential.SmtpHost),
+			SmtpHost:      smtpHost,
 			SmtpPort:      req.ApiCredential.SmtpPort,
 			Username:      req.ApiCredential.Username,
 			Password:      req.ApiCredential.Password,
 			UseTLS:        req.ApiCredential.UseTLS,
-			SkipTLSVerify: req.ApiCredential.SkipTLSVerify,
+			SkipTLSVerify: false,
 			AuthType:      authType,
 			OAuthToken:    req.ApiCredential.OAuthToken,
 		}

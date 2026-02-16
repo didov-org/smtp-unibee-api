@@ -38,11 +38,10 @@ type EmailGatewaySmtp struct {
 	SmtpHost      string `json:"smtpHost,omitempty"`
 	SmtpPort      int    `json:"smtpPort,omitempty"`
 	Username      string `json:"username,omitempty"`
-	Password      string `json:"password,omitempty"`
+	HasPassword   bool   `json:"hasPassword,omitempty"`
 	UseTLS        bool   `json:"useTLS,omitempty"`
-	SkipTLSVerify bool   `json:"skipTLSVerify,omitempty"`
 	AuthType      string `json:"authType,omitempty"`
-	OAuthToken    string `json:"oauthToken,omitempty"`
+	HasOAuthToken bool   `json:"hasOAuthToken,omitempty"`
 }
 
 type EmailGatewaySendgrid struct {
