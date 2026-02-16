@@ -92,7 +92,7 @@ type ApiCredential struct {
 	Username string `json:"username,omitempty" dc:"SMTP username"`
 	Password string `json:"password,omitempty" dc:"SMTP password"`
 	UseTLS   bool   `json:"useTLS,omitempty" dc:"Enable STARTTLS"`
-	AuthType string `json:"authType,omitempty" dc:"Auth type: plain, cram-md5, xoauth2"`
+	AuthType string `json:"authType,omitempty" dc:"Auth type: plain, login, cram-md5, xoauth2"`
 	OAuthToken string `json:"oauthToken,omitempty" dc:"OAuth2 token for xoauth2 auth"`
 }
 
