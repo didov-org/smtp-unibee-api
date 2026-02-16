@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 	"unibee/internal/logic/email/sender"
+	"unibee/utility"
 
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -148,6 +149,13 @@ func buildMimeMessage(f *sender.Sender, mailTo string, subject string, htmlConte
 }
 
 func sendSmtp(config *SmtpConfig, from string, to string, msg []byte) error {
+	// Re-validate host at send time to prevent DNS rebinding attacks.
+	// The host was validated at setup time, but DNS records may have changed
+	// to point to internal addresses since then.
+	if err := utility.ValidateExternalHost(config.SmtpHost); err != nil {
+		return fmt.Errorf("smtp host validation failed: %w", err)
+	}
+
 	addr := fmt.Sprintf("%s:%d", config.SmtpHost, config.SmtpPort)
 
 	tlsConfig := &tls.Config{
