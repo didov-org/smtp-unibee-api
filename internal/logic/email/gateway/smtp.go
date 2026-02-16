@@ -52,6 +52,29 @@ func (a *xoauth2Auth) Next(fromServer []byte, more bool) ([]byte, error) {
 	return nil, nil
 }
 
+type loginAuth struct {
+	username string
+	password string
+}
+
+func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", nil, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if !more {
+		return nil, nil
+	}
+	switch string(fromServer) {
+	case "Username:", "username:":
+		return []byte(a.username), nil
+	case "Password:", "password:":
+		return []byte(a.password), nil
+	default:
+		return nil, fmt.Errorf("unexpected LOGIN challenge: %s", fromServer)
+	}
+}
+
 func SendSmtpEmailToUser(ctx context.Context, f *sender.Sender, smtpConfig *SmtpConfig, mailTo string, subject string, body string) (string, error) {
 	if f == nil {
 		f = sender.GetDefaultSender()
@@ -191,6 +214,8 @@ func sendSmtp(config *SmtpConfig, from string, to string, msg []byte) error {
 	switch config.AuthType {
 	case "plain", "":
 		auth = smtp.PlainAuth("", config.Username, config.Password, config.SmtpHost)
+	case "login":
+		auth = &loginAuth{username: config.Username, password: config.Password}
 	case "cram-md5":
 		auth = smtp.CRAMMD5Auth(config.Username, config.Password)
 	case "xoauth2":

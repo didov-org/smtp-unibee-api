@@ -28,7 +28,7 @@ func (c *ControllerEmail) GatewaySetupV2(ctx context.Context, req *email.Gateway
 			authType = "plain"
 		}
 		switch authType {
-		case "plain", "cram-md5":
+		case "plain", "cram-md5", "login":
 			utility.Assert(len(req.ApiCredential.Username) > 0, "username is required for smtp with "+authType+" auth")
 			utility.Assert(len(req.ApiCredential.Password) > 0, "password is required for smtp with "+authType+" auth")
 		case "xoauth2":
